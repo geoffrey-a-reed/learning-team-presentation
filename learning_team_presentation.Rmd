@@ -3,6 +3,7 @@ title: "Title"
 subtitle: "Subtitle"
 output:
     powerpoint_presentation:
+        slide_level: 3
         reference_doc: "learning_team_presentation_style_reference.pptx"
 ---
 
@@ -13,9 +14,138 @@ knitr::opts_chunk$set(echo = FALSE)
 knitr::read_chunk('learning_team_presentation_analysis.R')
 ```
 
-## Example Slide
 
-```{r example}
-<<exampleChunk>>
+# Section Header (Slide 1)
+
+
+## Section Header (Slide 2)
+
+
+### Title (Slide 3)
+
+Content
+
+
+### Title (Slide 4)
+
+- a
+- nested
+    - bulleted
+    - list
+        - is
+        - good
+- now
+
+
+### Title (Slide 5)
+
+Content
+
+::: notes
+
+A note
+
+:::
+
+
+### Title (Slide 6)
+
+:::::: {.columns}
+
+::: {.column}
+
+Column 1
+
+:::
+
+::: {.column}
+
+Column 2
+
+:::
+
+::::::
+
+
+### Title (Slide 7)
+
+```{r example, echo=FALSE, fig.cap=caption, fig.width = 10, fig.height = 5, dpi = 600}
+caption <- 'a caption!'
+plot(rnorm(100))
 ```
+
+### Title (Slide 8)
+
+*italic*
+**bold**
+~~strikeout~~
+~subscript~
+^superscript^
+[small caps]{.smallcaps}
+`verbatim`
+
+> Block quote
+
+
+### Title (Slide 9)
+
+:::::: {.columns}
+
+::: {.column}
+
+```{r, echo=FALSE, fig.cap=caption, fig.width = 5, fig.height = 6, dpi = 600}
+caption <- 'a caption!'
+plot(rnorm(100))
+```
+:::
+
+::: {.column}
+
+#### Content Header
+
+##### Smaller Header
+
+###### Smallest Header
+
+stuff
+
+:::
+
+::::::
+
+
+### Title (Slide 10)
+
+one two three four five
+--- --- ----- ---  ----
+a   1   2     3    4
+b   1   2     3    4
+
+
+### Title (Slide 11)
+
+```{r, echo=FALSE}
+knitr::kable(head(mtcars, 3)[, 2:5])
+```
+
+
+### Title (Slide 12)
+
+:::::: {.columns}
+
+::: {.column}
+
+Column 1
+
+:::
+
+::: {.column}
+
+```{r, echo=FALSE}
+knitr::kable(head(mtcars, 3)[, 2:5])
+```
+
+:::
+
+::::::
 
