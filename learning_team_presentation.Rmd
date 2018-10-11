@@ -1,0 +1,21 @@
+---
+title: "Title"
+subtitle: "Subtitle"
+output:
+    powerpoint_presentation:
+        reference_doc: "learning_team_presentation_style_reference.pptx"
+---
+
+
+```{r setup, echo = FALSE, cache = FALSE}
+knitr::opts_knit$set(eval.after = 'fig.cap')
+knitr::opts_chunk$set(echo = FALSE)
+knitr::read_chunk('learning_team_presentation_analysis.R')
+```
+
+## Example Slide
+
+```{r example}
+<<exampleChunk>>
+```
+
