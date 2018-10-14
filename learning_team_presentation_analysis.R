@@ -452,28 +452,332 @@ longstreet_trigram_chapter_counts <-
 
 ## @knitr extract_hapax
 #
+grant_hapax_words <-
+  grant_word_counts %>%
+  filter(count == 1) %>%
+  pull(word)
 
+grant_dis_words <-
+  grant_word_counts %>%
+  filter(count == 2) %>%
+  pull(word)
+
+grant_tris_words <-
+  grant_word_counts %>%
+  filter(count == 3) %>%
+  pull(word)
+
+grant_tetrakis_words <-
+  grant_word_counts %>%
+  filter(count == 4) %>%
+  pull(word)
+
+grant_hapax_bigrams <-
+  grant_bigram_counts %>%
+  filter(count == 1) %>%
+  pull(bigram)
+
+grant_dis_bigrams <-
+  grant_bigram_counts %>%
+  filter(count == 2) %>%
+  pull(bigram)
+
+grant_tris_bigrams <-
+  grant_bigram_counts %>%
+  filter(count == 3) %>%
+  pull(bigram)
+
+grant_tetrakis_bigrams <-
+  grant_bigram_counts %>%
+  filter(count == 4) %>%
+  pull(bigram)
+
+grant_hapax_trigrams <-
+  grant_trigram_counts %>%
+  filter(count == 1) %>%
+  pull(trigram)
+
+grant_dis_trigrams <-
+  grant_trigram_counts %>%
+  filter(count == 2) %>%
+  pull(trigram)
+
+grant_tris_trigrams <-
+  grant_trigram_counts %>%
+  filter(count == 3) %>%
+  pull(trigram)
+
+grant_tetrakis_trigrams <-
+  grant_trigram_counts %>%
+  filter(count == 4) %>%
+  pull(trigram)
+
+longstreet_hapax_words <-
+  longstreet_word_counts %>%
+  filter(count == 1) %>%
+  pull(word)
+
+longstreet_dis_words <-
+  longstreet_word_counts %>%
+  filter(count == 2) %>%
+  pull(word)
+
+longstreet_tris_words <-
+  longstreet_word_counts %>%
+  filter(count == 3) %>%
+  pull(word)
+
+longstreet_tetrakis_words <-
+  longstreet_word_counts %>%
+  filter(count == 4) %>%
+  pull(word)
+
+longstreet_hapax_bigrams <-
+  longstreet_bigram_counts %>%
+  filter(count == 1) %>%
+  pull(bigram)
+
+longstreet_dis_bigrams <-
+  longstreet_bigram_counts %>%
+  filter(count == 2) %>%
+  pull(bigram)
+
+longstreet_tris_bigrams <-
+  longstreet_bigram_counts %>%
+  filter(count == 3) %>%
+  pull(bigram)
+
+longstreet_tetrakis_bigrams <-
+  longstreet_bigram_counts %>%
+  filter(count == 4) %>%
+  pull(bigram)
+
+longstreet_hapax_trigrams <-
+  longstreet_trigram_counts %>%
+  filter(count == 1) %>%
+  pull(trigram)
+
+longstreet_dis_trigrams <-
+  longstreet_trigram_counts %>%
+  filter(count == 2) %>%
+  pull(trigram)
+
+longstreet_tris_trigrams <-
+  longstreet_trigram_counts %>%
+  filter(count == 3) %>%
+  pull(trigram)
+
+longstreet_tetrakis_trigrams <-
+  longstreet_trigram_counts %>%
+  filter(count == 4) %>%
+  pull(trigram)
 # (End)
 
 
 ## @knitr type_token_ratio
 #
 #
+grant_ttr_words_by_text <-
+  grant_words %>%
+  group_by(text_num) %>%
+  summarize(
+    word_count = n(),
+    distinct_word_count = n_distinct(word),
+    ttr_word = distinct_word_count / word_count
+  ) %>%
+  ungroup()
 
+grant_ttr_words_by_chapter <-
+  grant_words %>%
+  group_by(chapter_num) %>%
+  summarize(
+    word_count = n(),
+    distinct_word_count = n_distinct(word),
+    ttr_word = distinct_word_count / word_count
+  ) %>%
+  ungroup()
+
+grant_ttr_bigrams_by_text <-
+  grant_bigrams %>%
+  group_by(text_num) %>%
+  summarize(
+    bigram_count = n(),
+    distinct_bigram_count = n_distinct(bigram),
+    ttr_bigram = distinct_bigram_count / bigram_count
+  ) %>%
+  ungroup()
+
+grant_ttr_bigrams_by_chapter <-
+  grant_bigrams %>%
+  group_by(chapter_num) %>%
+  summarize(
+    bigram_count = n(),
+    distinct_bigram_count = n_distinct(bigram),
+    ttr_bigram = distinct_bigram_count / bigram_count
+  ) %>%
+  ungroup()
+
+grant_ttr_trigrams_by_text <-
+  grant_trigrams %>%
+  group_by(text_num) %>%
+  summarize(
+    trigram_count = n(),
+    distinct_trigram_count = n_distinct(trigram),
+    ttr_trigram = distinct_trigram_count / trigram_count
+  ) %>%
+  ungroup()
+
+grant_ttr_trigrams_by_chapter <-
+  grant_trigrams %>%
+  group_by(chapter_num) %>%
+  summarize(
+    trigram_count = n(),
+    distinct_trigram_count = n_distinct(trigram),
+    ttr_trigram = distinct_trigram_count / trigram_count
+  ) %>%
+  ungroup()
+
+grant_ttr_text <-
+  grant_ttr_words_by_text %>%
+  inner_join(grant_ttr_bigrams_by_text, by = 'text_num') %>%
+  inner_join(grant_ttr_trigrams_by_text, by = 'text_num')
+
+grant_ttr_chapter <-
+  grant_ttr_words_by_chapter %>%
+  inner_join(grant_ttr_bigrams_by_chapter, by = 'chapter_num') %>%
+  inner_join(grant_ttr_trigrams_by_chapter, by = 'chapter_num')
+
+longstreet_ttr_words_by_text <-
+  longstreet_words %>%
+  group_by(text_num) %>%
+  summarize(
+    word_count = n(),
+    distinct_word_count = n_distinct(word),
+    ttr_word = distinct_word_count / word_count
+  ) %>%
+  ungroup()
+
+longstreet_ttr_words_by_chapter <-
+  longstreet_words %>%
+  group_by(chapter_num) %>%
+  summarize(
+    word_count = n(),
+    distinct_word_count = n_distinct(word),
+    ttr_word = distinct_word_count / word_count
+  ) %>%
+  ungroup()
+
+longstreet_ttr_bigrams_by_text <-
+  longstreet_bigrams %>%
+  group_by(text_num) %>%
+  summarize(
+    bigram_count = n(),
+    distinct_bigram_count = n_distinct(bigram),
+    ttr_bigram = distinct_bigram_count / bigram_count
+  ) %>%
+  ungroup()
+
+longstreet_ttr_bigrams_by_chapter <-
+  longstreet_bigrams %>%
+  group_by(chapter_num) %>%
+  summarize(
+    bigram_count = n(),
+    distinct_bigram_count = n_distinct(bigram),
+    ttr_bigram = distinct_bigram_count / bigram_count
+  ) %>%
+  ungroup()
+
+longstreet_ttr_trigrams_by_text <-
+  longstreet_trigrams %>%
+  group_by(text_num) %>%
+  summarize(
+    trigram_count = n(),
+    distinct_trigram_count = n_distinct(trigram),
+    ttr_trigram = distinct_trigram_count / trigram_count
+  ) %>%
+  ungroup()
+
+longstreet_ttr_trigrams_by_chapter <-
+  longstreet_trigrams %>%
+  group_by(chapter_num) %>%
+  summarize(
+    trigram_count = n(),
+    distinct_trigram_count = n_distinct(trigram),
+    ttr_trigram = distinct_trigram_count / trigram_count
+  ) %>%
+  ungroup()
+
+longstreet_ttr_text <-
+  longstreet_ttr_words_by_text %>%
+  inner_join(longstreet_ttr_bigrams_by_text, by = 'text_num') %>%
+  inner_join(longstreet_ttr_trigrams_by_text, by = 'text_num')
+
+longstreet_ttr_chapter <-
+  longstreet_ttr_words_by_chapter %>%
+  inner_join(longstreet_ttr_bigrams_by_chapter, by = 'chapter_num') %>%
+  inner_join(longstreet_ttr_trigrams_by_chapter, by = 'chapter_num')
 # (End)
 
 
 ## @knitr declare_tidykwic
 #
 #
-
+tidykwic <- function(tbl, col, keywords, n = 5) {
+  enquo_col <- enquo(col)
+  ngrams <-
+    tbl %>%
+    unnest_tokens(kwic, !!enquo_col, token = 'ngrams', n = n)
+  keywords %>%
+    map_dfr(function(keyword) {
+      pattern <-
+        keyword %>%
+        str_c('^(?:\\w+\\W+){', n %/% 2, '}\\b', ., '\\b') %>%
+        regex(ignore_case = TRUE)
+      ngrams %>%
+        filter(
+          kwic %>% is.na() %>% not(),
+          kwic %>% str_detect(pattern)
+        ) %>%
+        mutate(keyword = keyword)
+    })
+}
 # (End)
 
 
 ## @knitr kwic_hapax
 #
 #
+grant_hapax_words_kwic <-
+  grant_sentences %>%
+  tidykwic(sentence, grant_hapax_words)
 
+grant_dis_words_kwic <-
+  grant_sentences %>%
+  tidykwic(sentence, grant_dis_words)
+
+grant_tris_words_kwic <-
+  grant_sentences %>%
+  tidykwic(sentence, grant_tris_words)
+
+grant_tetrakis_words_kwic <-
+  grant_sentences %>%
+  tidykwic(sentence, grant_tetrakis_words)
+
+longstreet_hapax_words_kwic <-
+  longstreet_sentences %>%
+  tidykwic(sentence, longstreet_hapax_words)
+
+longstreet_dis_words_kwic <-
+  longstreet_sentences %>%
+  tidykwic(sentence, longstreet_dis_words)
+
+longstreet_tris_words_kwic <-
+  longstreet_sentences %>%
+  tidykwic(sentence, longstreet_tris_words)
+
+longstreet_tetrakis_words_kwic <-
+  longstreet_sentences %>%
+  tidykwic(sentence, longstreet_tetrakis_words)
 # (End)
 
 
