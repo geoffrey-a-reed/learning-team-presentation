@@ -361,6 +361,129 @@ longstreet_trigrams_nostop <-
 # (End)
 
 
+## @knitr token_counts
+#
+#
+grant_word_counts <-
+  grant_words %>%
+  group_by(word) %>%
+  summarize(count = n()) %>%
+  ungroup() %>%
+  arrange(count)
+
+grant_word_chapter_counts <-
+  grant_words %>%
+  group_by(chapter_num, word) %>%
+  summarize(count = n()) %>%
+  ungroup() %>%
+  arrange(chapter_num, count)
+
+grant_bigram_counts <-
+  grant_bigrams %>%
+  group_by(bigram) %>%
+  summarize(count = n()) %>%
+  ungroup() %>%
+  arrange(count)
+
+grant_bigram_chapter_counts <-
+  grant_bigrams %>%
+  group_by(chapter_num, bigram) %>%
+  summarize(count = n()) %>%
+  ungroup() %>%
+  arrange(chapter_num, count)
+
+grant_trigram_counts <-
+  grant_trigrams %>%
+  group_by(trigram) %>%
+  summarize(count = n()) %>%
+  ungroup() %>%
+  arrange(count)
+
+grant_trigram_chapter_counts <-
+  grant_trigrams %>%
+  group_by(chapter_num, trigram) %>%
+  summarize(count = n()) %>%
+  ungroup() %>%
+  arrange(chapter_num, count)
+
+longstreet_word_counts <-
+  longstreet_words %>%
+  group_by(word) %>%
+  summarize(count = n()) %>%
+  ungroup() %>%
+  arrange(count)
+
+longstreet_word_chapter_counts <-
+  longstreet_words %>%
+  group_by(chapter_num, word) %>%
+  summarize(count = n()) %>%
+  ungroup() %>%
+  arrange(chapter_num, count)
+
+longstreet_bigram_counts <-
+  longstreet_bigrams %>%
+  group_by(bigram) %>%
+  summarize(count = n()) %>%
+  ungroup() %>%
+  arrange(count)
+
+longstreet_bigram_chapter_counts <-
+  longstreet_bigrams %>%
+  group_by(chapter_num, bigram) %>%
+  summarize(count = n()) %>%
+  ungroup() %>%
+  arrange(chapter_num, count)
+
+longstreet_trigram_counts <-
+  longstreet_trigrams %>%
+  group_by(trigram) %>%
+  summarize(count = n()) %>%
+  ungroup() %>%
+  arrange(count)
+
+longstreet_trigram_chapter_counts <-
+  longstreet_trigrams %>%
+  group_by(chapter_num, trigram) %>%
+  summarize(count = n()) %>%
+  ungroup() %>%
+  arrange(chapter_num, count)
+# (End)
+
+
+## @knitr extract_hapax
+#
+
+# (End)
+
+
+## @knitr type_token_ratio
+#
+#
+
+# (End)
+
+
+## @knitr declare_tidykwic
+#
+#
+
+# (End)
+
+
+## @knitr kwic_hapax
+#
+#
+
+# (End)
+
+
+## @knitr tf_idf
+#
+#
+
+# (End)
+
+
 ## @knitr token_frequencies
 #
 #
@@ -520,6 +643,280 @@ longstreet_trigram_chapter_freqs_nostop <-
   ungroup() %>%
   arrange(chapter_num, frequency %>% desc())
 # (End)
+
+
+## @knitr positional_token_frequencies
+#
+#
+grant_word_starting_sentence_freqs_nostop <-
+  grant_words %>%
+  group_by(sentence_num) %>%
+  summarize(word = first(word)) %>%
+  ungroup() %>%
+  filter((word %in% smart_stopwords) %>% not()) %>%
+  mutate(total = n()) %>%
+  group_by(word) %>%
+  summarize(
+    total = first(total),
+    count = n(),
+    frequency = count / total
+  ) %>%
+  ungroup() %>%
+  arrange(frequency %>% desc())
+
+grant_bigram_starting_sentence_freqs_nostop <-
+  grant_bigrams %>%
+  group_by(sentence_num) %>%
+  summarize(bigram = first(bigram)) %>%
+  ungroup() %>%
+  separate(bigram, c('word1', 'word2'), sep = '\\s+') %>%
+  filter(
+    (word1 %in% smart_stopwords) %>% not(),
+    (word2 %in% smart_stopwords) %>% not()
+  ) %>%
+  unite(bigram, c('word1', 'word2'), sep = ' ') %>%
+  mutate(total = n()) %>%
+  group_by(bigram) %>%
+  summarize(
+    total = first(total),
+    count = n(),
+    frequency = count / total
+  ) %>%
+  ungroup() %>%
+  arrange(frequency %>% desc())
+
+grant_trigram_starting_sentence_freqs_nostop <-
+  grant_trigrams %>%
+  group_by(sentence_num) %>%
+  summarize(trigram = first(trigram)) %>%
+  ungroup() %>%
+  separate(trigram, c('word1', 'word2', 'word3'), sep = '\\s+') %>%
+  filter(
+    (word1 %in% smart_stopwords) %>% not(),
+    (word2 %in% smart_stopwords) %>% not(),
+    (word3 %in% smart_stopwords) %>% not()
+  ) %>%
+  unite(trigram, c('word1', 'word2', 'word3'), sep = ' ') %>%
+  mutate(total = n()) %>%
+  group_by(trigram) %>%
+  summarize(
+    total = first(total),
+    count = n(),
+    frequency = count / total
+  ) %>%
+  ungroup() %>%
+  arrange(frequency %>% desc())
+
+grant_word_ending_sentence_freqs_nostop <-
+  grant_words %>%
+  group_by(sentence_num) %>%
+  summarize(word = last(word)) %>%
+  ungroup() %>%
+  filter((word %in% smart_stopwords) %>% not()) %>%
+  mutate(total = n()) %>%
+  group_by(word) %>%
+  summarize(
+    total = first(total),
+    count = n(),
+    frequency = count / total
+  ) %>%
+  ungroup() %>%
+  arrange(frequency %>% desc())
+
+grant_bigram_ending_sentence_freqs_nostop <-
+  grant_bigrams %>%
+  group_by(sentence_num) %>%
+  summarize(bigram = last(bigram)) %>%
+  ungroup() %>%
+  separate(bigram, c('word1', 'word2'), sep = '\\s+') %>%
+  filter(
+    (word1 %in% smart_stopwords) %>% not(),
+    (word2 %in% smart_stopwords) %>% not()
+  ) %>%
+  unite(bigram, c('word1', 'word2'), sep = ' ') %>%
+  mutate(total = n()) %>%
+  group_by(bigram) %>%
+  summarize(
+    total = first(total),
+    count = n(),
+    frequency = count / total
+  ) %>%
+  ungroup() %>%
+  arrange(frequency %>% desc())
+
+grant_trigram_ending_sentence_freqs_nostop <-
+  grant_trigrams %>%
+  group_by(sentence_num) %>%
+  summarize(trigram = last(trigram)) %>%
+  ungroup() %>%
+  separate(trigram, c('word1', 'word2', 'word3'), sep = '\\s+') %>%
+  filter(
+    (word1 %in% smart_stopwords) %>% not(),
+    (word2 %in% smart_stopwords) %>% not(),
+    (word3 %in% smart_stopwords) %>% not()
+  ) %>%
+  unite(trigram, c('word1', 'word2', 'word3'), sep = ' ') %>%
+  mutate(total = n()) %>%
+  group_by(trigram) %>%
+  summarize(
+    total = first(total),
+    count = n(),
+    frequency = count / total
+  ) %>%
+  ungroup() %>%
+  arrange(frequency %>% desc())
+
+longstreet_word_starting_sentence_freqs_nostop <-
+  longstreet_words %>%
+  group_by(sentence_num) %>%
+  summarize(word = first(word)) %>%
+  ungroup() %>%
+  filter((word %in% smart_stopwords) %>% not()) %>%
+  mutate(total = n()) %>%
+  group_by(word) %>%
+  summarize(
+    total = first(total),
+    count = n(),
+    frequency = count / total
+  ) %>%
+  ungroup() %>%
+  arrange(frequency %>% desc())
+
+longstreet_bigram_starting_sentence_freqs_nostop <-
+  longstreet_bigrams %>%
+  group_by(sentence_num) %>%
+  summarize(bigram = first(bigram)) %>%
+  ungroup() %>%
+  separate(bigram, c('word1', 'word2'), sep = '\\s+') %>%
+  filter(
+    (word1 %in% smart_stopwords) %>% not(),
+    (word2 %in% smart_stopwords) %>% not()
+  ) %>%
+  unite(bigram, c('word1', 'word2'), sep = ' ') %>%
+  mutate(total = n()) %>%
+  group_by(bigram) %>%
+  summarize(
+    total = first(total),
+    count = n(),
+    frequency = count / total
+  ) %>%
+  ungroup() %>%
+  arrange(frequency %>% desc())
+
+longstreet_trigram_starting_sentence_freqs_nostop <-
+  longstreet_trigrams %>%
+  group_by(sentence_num) %>%
+  summarize(trigram = first(trigram)) %>%
+  ungroup() %>%
+  separate(trigram, c('word1', 'word2', 'word3'), sep = '\\s+') %>%
+  filter(
+    (word1 %in% smart_stopwords) %>% not(),
+    (word2 %in% smart_stopwords) %>% not(),
+    (word3 %in% smart_stopwords) %>% not()
+  ) %>%
+  unite(trigram, c('word1', 'word2', 'word3'), sep = ' ') %>%
+  mutate(total = n()) %>%
+  group_by(trigram) %>%
+  summarize(
+    total = first(total),
+    count = n(),
+    frequency = count / total
+  ) %>%
+  ungroup() %>%
+  arrange(frequency %>% desc())
+
+longstreet_word_ending_sentence_freqs_nostop <-
+  longstreet_words %>%
+  group_by(sentence_num) %>%
+  summarize(word = last(word)) %>%
+  ungroup() %>%
+  filter((word %in% smart_stopwords) %>% not()) %>%
+  mutate(total = n()) %>%
+  group_by(word) %>%
+  summarize(
+    total = first(total),
+    count = n(),
+    frequency = count / total
+  ) %>%
+  ungroup() %>%
+  arrange(frequency %>% desc())
+
+longstreet_bigram_ending_sentence_freqs_nostop <-
+  longstreet_bigrams %>%
+  group_by(sentence_num) %>%
+  summarize(bigram = last(bigram)) %>%
+  ungroup() %>%
+  separate(bigram, c('word1', 'word2'), sep = '\\s+') %>%
+  filter(
+    (word1 %in% smart_stopwords) %>% not(),
+    (word2 %in% smart_stopwords) %>% not()
+  ) %>%
+  unite(bigram, c('word1', 'word2'), sep = ' ') %>%
+  mutate(total = n()) %>%
+  group_by(bigram) %>%
+  summarize(
+    total = first(total),
+    count = n(),
+    frequency = count / total
+  ) %>%
+  ungroup() %>%
+  arrange(frequency %>% desc())
+
+longstreet_trigram_ending_sentence_freqs_nostop <-
+  longstreet_trigrams %>%
+  group_by(sentence_num) %>%
+  summarize(trigram = last(trigram)) %>%
+  ungroup() %>%
+  separate(trigram, c('word1', 'word2', 'word3'), sep = '\\s+') %>%
+  filter(
+    (word1 %in% smart_stopwords) %>% not(),
+    (word2 %in% smart_stopwords) %>% not(),
+    (word3 %in% smart_stopwords) %>% not()
+  ) %>%
+  unite(trigram, c('word1', 'word2', 'word3'), sep = ' ') %>%
+  mutate(total = n()) %>%
+  group_by(trigram) %>%
+  summarize(
+    total = first(total),
+    count = n(),
+    frequency = count / total
+  ) %>%
+  ungroup() %>%
+  arrange(frequency %>% desc())
+# (End)
+
+
+## @knitr token_correlations
+#
+#
+grant_word_sentence_corrs_nostop <-
+  grant_words_nostop %>%
+  group_by(word) %>%
+  mutate(count = n()) %>%
+  ungroup() %>%
+  filter(count > 5) %>%
+  pairwise_cor(word, sentence_num, method = 'pearson') %>%
+  filter(correlation < 0.99) %>%
+  rename(word1 = item1, word2 = item2) %>%
+  arrange(correlation %>% desc())
+
+longstreet_word_sentence_corrs_nostop <-
+  longstreet_words_nostop %>%
+  group_by(word) %>%
+  mutate(count = n()) %>%
+  ungroup() %>%
+  filter(count > 5) %>%
+  pairwise_cor(word, sentence_num, method = 'pearson') %>%
+  filter(correlation < 0.99) %>%
+  rename(word1 = item1, word2 = item2) %>%
+  arrange(correlation %>% desc())
+# (End)
+
+
+
+
+
+## @knitr
 
 
 ## @knitr exampleChunk
