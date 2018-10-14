@@ -167,8 +167,99 @@ longstreet_paragraphs <-
     paragraph %>% str_detect('most obedient and humble servant') %>% not()
   ) %>%
   mutate(paragraph_num = 1:length(paragraph))
-#
+# (End)
 
+
+## @knitr extract_sentences
+#
+#
+grant_sentences <-
+  grant_paragraphs %>%
+  mutate(
+    paragraph =
+      paragraph %>%
+      str_replace_all(
+        c(
+          'Mrs\\.' = 'Missus',
+          'Jesse R\\. Grant' = 'Jesse Root Grant',
+          'Mr\\.' = 'Mister',
+          'John D\\. White' = 'John White',
+          'Thomas L\\. Hamer' = 'Thomas Hamer',
+          'General A\\. ?V\\. Kautz' = 'General Kautz',
+          'C\\.F\\. Smith' = 'Charles Ferguson Smith',
+          'F\\. ?T\\. Dent' = 'Mister Dent',
+          'St\\.' = 'Saint',
+          'U\\. ?S\\.' = 'US',
+          'B\\.B\\. Howard' = 'Mister Howard',
+          'E\\.B\\. Washburne' = 'Mister Washburne',
+          'Hon\\.' = 'Honorable',
+          'F\\.P\\. Blair' = 'Mister Blair',
+          'S\\.A\\. Douglas' = 'Stephen Arnold Douglas',
+          'John M\\. Palmer' = 'John Palmer',
+          'C\\.B\\.' = '',
+          'B\\.M\\.' = '',
+          'Jefferson C\\. Davis' = 'Jefferson Columbus Davis',
+          'W\\.H\\.L\\.' = '',
+          'H\\.\\W.' = '',
+          'S\\.B\\.' = '',
+          'Lew\\.' = '',
+          'J\\.D\\.' = '',
+          'Col\\.' = 'Colonel',
+          'Dr\\.' = 'Doctor',
+          '1st\\.' = 'First:',
+          '2d\\.' = 'Second:',
+          '3d\\.' ='Third:',
+          '\\b\\p{Lu}\\.{1,2}' = '',
+          '\\(\\d+\\)' = '',
+          '\\s+\\.\\s+' = ' '
+        )
+      )
+  ) %>%
+  unnest_tokens(sentence, paragraph, token = 'sentences', to_lower = FALSE) %>%
+  mutate(
+    sentence = sentence %>% str_trim() %>% str_squish(),
+    sentence_num = 1:length(sentence)
+  )
+
+longstreet_sentences <-
+  longstreet_paragraphs %>%
+  mutate(
+    paragraph =
+      paragraph %>%
+      str_replace_all(
+        c(
+          'Mr\\.' = 'Mister',
+          'Dr\\.' = 'Doctor',
+          'Mrs\\.' = 'Missus',
+          '1\\.' = 'One: ',
+          '2\\.' = 'Two: ',
+          '3\\.' = 'Three: ',
+          '4\\.' = 'Four: ',
+          'First\\.' = 'First:',
+          'Second\\.' = 'Second:',
+          'Third\\.' = 'Third:;',
+          'Fourth\\.' = 'Fourth:',
+          'Fifth\\.' = 'Fifth:',
+          'Sixth\\.' = 'Sixth:',
+          'Inf\\.' = 'Infantry',
+          'Col\\.' = 'Colonel',
+          'Battn\\.' = 'Battalion',
+          'Cav\\.' = 'Cavalry',
+          'Co\\.' = 'Company',
+          'Ind\\.' = '',
+          'Capt\\.' = 'Captain',
+          'Regt\\.' = 'Regiment',
+          'Lieut\\.' = 'Lieutenant',
+          '\\b\\p{Lu}\\.{1,2}' = ''
+        )
+      )
+  ) %>%
+  unnest_tokens(sentence, paragraph, token = 'sentences', to_lower = FALSE) %>%
+  mutate(
+    sentence = sentence %>% str_trim() %>% str_squish(),
+    sentence_num = 1:length(sentence)
+  ) %>% View()
+# (End)
 
 
 
