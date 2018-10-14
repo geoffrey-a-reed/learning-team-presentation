@@ -40,6 +40,10 @@ grant_texts <-
           '(?:\\r\\n){5}CHAPTER.+herculean deeds of valor\\.',
           dotall = TRUE
         )
+      ) %>%
+      str_replace(
+        regex('END OF VOLUME I.*?APPENDIX', dotall = TRUE),
+        ''
       )
   )
 
@@ -571,6 +575,66 @@ longstreet_tetrakis_trigrams <-
   longstreet_trigram_counts %>%
   filter(count == 4) %>%
   pull(trigram)
+
+shared_hapax_words <- intersect(
+  grant_hapax_words,
+  longstreet_hapax_words
+)
+
+shared_dis_words <- intersect(
+  grant_dis_words,
+  longstreet_dis_words
+)
+
+shared_tris_words <- intersect(
+  grant_tris_words,
+  longstreet_tris_words
+)
+
+shared_tetrakis_words <- intersect(
+  grant_tetrakis_words,
+  longstreet_tetrakis_words
+)
+
+shared_hapax_bigrams <- intersect(
+  grant_hapax_bigrams,
+  longstreet_hapax_bigrams
+)
+
+shared_dis_bigrams <- intersect(
+  grant_dis_bigrams,
+  longstreet_dis_bigrams
+)
+
+shared_tris_bigrams <- intersect(
+  grant_tris_bigrams,
+  longstreet_tris_bigrams
+)
+
+shared_tetrakis_bigrams <- intersect(
+  grant_tetrakis_bigrams,
+  longstreet_tetrakis_bigrams
+)
+
+shared_hapax_trigrams <- intersect(
+  grant_hapax_trigrams,
+  longstreet_hapax_trigrams
+)
+
+shared_dis_trigrams <- intersect(
+  grant_dis_trigrams,
+  longstreet_dis_trigrams
+)
+
+shared_tris_trigrams <- intersect(
+  grant_dis_trigrams,
+  longstreet_dis_trigrams
+)
+
+shared_tetrakis_trigrams <- intersect(
+  grant_tetrakis_trigrams,
+  longstreet_tetrakis_trigrams
+)
 # (End)
 
 
@@ -747,44 +811,44 @@ tidykwic <- function(tbl, col, keywords, n = 5) {
 ## @knitr kwic_hapax
 #
 #
-grant_hapax_words_kwic <-
-  grant_sentences %>%
-  tidykwic(sentence, grant_hapax_words)
+suppressWarnings({
 
-grant_dis_words_kwic <-
-  grant_sentences %>%
-  tidykwic(sentence, grant_dis_words)
+  shared_hapax_words_kwic <-
+    bind_rows(grant_sentences, longstreet_sentences) %>%
+    tidykwic(sentence, shared_hapax_words)
 
-grant_tris_words_kwic <-
-  grant_sentences %>%
-  tidykwic(sentence, grant_tris_words)
+  shared_dis_words_kwic <-
+    bind_rows(grant_sentences, longstreet_sentences) %>%
+    tidykwic(sentence, shared_dis_words)
 
-grant_tetrakis_words_kwic <-
-  grant_sentences %>%
-  tidykwic(sentence, grant_tetrakis_words)
+  shared_tris_words_kwic <-
+    bind_rows(grant_sentences, longstreet_sentences) %>%
+    tidykwic(sentence, shared_tris_words)
 
-longstreet_hapax_words_kwic <-
-  longstreet_sentences %>%
-  tidykwic(sentence, longstreet_hapax_words)
-
-longstreet_dis_words_kwic <-
-  longstreet_sentences %>%
-  tidykwic(sentence, longstreet_dis_words)
-
-longstreet_tris_words_kwic <-
-  longstreet_sentences %>%
-  tidykwic(sentence, longstreet_tris_words)
-
-longstreet_tetrakis_words_kwic <-
-  longstreet_sentences %>%
-  tidykwic(sentence, longstreet_tetrakis_words)
+  shared_tetrakis_words_kwic <-
+    bind_rows(grant_sentences, longstreet_sentences) %>%
+    tidykwic(sentence, shared_tetrakis_words)
+})
 # (End)
 
 
 ## @knitr tf_idf
 #
 #
+word_text_tf_idf <- grant_word_counts %>%
+  mutate(text_num = 1) %>%
+  bind_rows(longstreet_word_counts %>% mutate(text_num = 2)) %>%
+  bind_tf_idf(word, text_num, count)
 
+bigram_text_tf_idf <- grant_bigram_counts %>%
+  mutate(text_num = 1) %>%
+  bind_rows(longstreet_bigram_counts %>% mutate(text_num = 2)) %>%
+  bind_tf_idf(bigram, text_num, count)
+
+trigram_text_tf_idf <- grant_trigram_counts %>%
+  mutate(text_num = 1) %>%
+  bind_rows(longstreet_trigram_counts %>% mutate(text_num = 2)) %>%
+  bind_tf_idf(trigram, text_num, count)
 # (End)
 
 
@@ -1215,12 +1279,6 @@ longstreet_word_sentence_corrs_nostop <-
   rename(word1 = item1, word2 = item2) %>%
   arrange(correlation %>% desc())
 # (End)
-
-
-
-
-
-## @knitr
 
 
 ## @knitr exampleChunk
