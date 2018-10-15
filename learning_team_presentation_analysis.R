@@ -788,9 +788,9 @@ longstreet_ttr_chapter <-
 #
 kwic_sentence <- function(sentences, keywords, n = 5) {
   maxlim <- n %/% 2
-  pattern = str_c('(?:\\w+\\W+){0,', maxlim, '}\\b', keyword, '\\b(?:\\W+\\w+){0,', maxlim, '}')
   keywords %>%
     map_dfr(function(keyword) {
+      pattern = str_c('(?:\\w+\\W+){0,', maxlim, '}\\b', keyword, '\\b(?:\\W+\\w+){0,', maxlim, '}')
       sentences %>%
         transmute(
           text_num = text_num,
