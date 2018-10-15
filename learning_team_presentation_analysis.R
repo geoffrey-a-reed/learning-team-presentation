@@ -786,23 +786,21 @@ longstreet_ttr_chapter <-
 ## @knitr declare_tidykwic
 #
 #
-tidykwic <- function(tbl, col, keywords, n = 5) {
-  enquo_col <- enquo(col)
-  ngrams <-
-    tbl %>%
-    unnest_tokens(kwic, !!enquo_col, token = 'ngrams', n = n)
+kwic_sentence <- function(sentences, keywords, n = 5) {
+  maxlim <- n %/% 2
+  pattern = str_c('(?:\\w+\\W+){0,', maxlim, '}\\b', keyword, '\\b(?:\\W+\\w+){0,', maxlim, '}')
   keywords %>%
     map_dfr(function(keyword) {
-      pattern <-
-        keyword %>%
-        str_c('^(?:\\w+\\W+){', n %/% 2, '}\\b', ., '\\b') %>%
-        regex(ignore_case = TRUE)
-      ngrams %>%
-        filter(
-          kwic %>% is.na() %>% not(),
-          kwic %>% str_detect(pattern)
+      sentences %>%
+        transmute(
+          text_num = text_num,
+          chapter_num = chapter_num,
+          paragraph_num = paragraph_num,
+          sentence_num = sentence_num,
+          keyword = keyword,
+          kwic = sentence %>% str_extract(pattern) %>% str_to_lower()
         ) %>%
-        mutate(keyword = keyword)
+        filter(kwic %>% is.na() %>% not())
     })
 }
 # (End)
@@ -815,19 +813,19 @@ suppressWarnings({
 
   shared_hapax_words_kwic <-
     bind_rows(grant_sentences, longstreet_sentences) %>%
-    tidykwic(sentence, shared_hapax_words)
+    kwic_sentence(shared_hapax_words)
 
   shared_dis_words_kwic <-
     bind_rows(grant_sentences, longstreet_sentences) %>%
-    tidykwic(sentence, shared_dis_words)
+    kwic_sentence(shared_dis_words)
 
   shared_tris_words_kwic <-
     bind_rows(grant_sentences, longstreet_sentences) %>%
-    tidykwic(sentence, shared_tris_words)
+    kwic_sentence(shared_tris_words)
 
   shared_tetrakis_words_kwic <-
     bind_rows(grant_sentences, longstreet_sentences) %>%
-    tidykwic(sentence, shared_tetrakis_words)
+    kwic_sentence(shared_tetrakis_words)
 })
 # (End)
 
