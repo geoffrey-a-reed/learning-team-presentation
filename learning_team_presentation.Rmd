@@ -1,9 +1,10 @@
 ---
-title: "Title"
-subtitle: "Subtitle"
+title: "Grant & Longstreet"
+subtitle: "An\nOpposing\nFriendship"
+authors: "Randy Green | Daniel Hadidon | Geoffrey Reed"
 output:
     powerpoint_presentation:
-        slide_level: 3
+        slide_level: 2
         reference_doc: "learning_team_presentation_style_reference.pptx"
 ---
 
@@ -14,138 +15,156 @@ knitr::opts_chunk$set(echo = FALSE)
 knitr::read_chunk('learning_team_presentation_analysis.R')
 ```
 
+## Texts
 
-# Section Header (Slide 1)
+###### *Personal Memoirs of U. S. Grant*
 
+- Ulysses S. Grant
 
-## Section Header (Slide 2)
+###### *From Manassas to Appomattox: Memoirs of the Civil War in America*
 
-
-### Title (Slide 3)
-
-Content
-
-
-### Title (Slide 4)
-
-- a
-- nested
-    - bulleted
-    - list
-        - is
-        - good
-- now
+- by James Longstreet
 
 
-### Title (Slide 5)
+## Introductions
 
-Content
-
-::: notes
-
-A note
-
-:::
+- Who were these guys? (30-second version)
+- Who are we? (10-second version)
 
 
-### Title (Slide 6)
+## Topics
 
-:::::: {.columns}
-
-::: {.column}
-
-Column 1
-
-:::
-
-::: {.column}
-
-Column 2
-
-:::
-
-::::::
+- Orientations
+- Summary Statistics
+- Frequency Analysis
+- Token Distribution Analysis
+- Correlation Analysis
+- Type-Token Ratio
+- Hapax Richness
+- KWIC
+- Sentiment Analysis
+- Conclusions
 
 
-### Title (Slide 7)
-
-```{r example, echo=FALSE, fig.cap=caption, fig.width = 10, fig.height = 5, dpi = 600}
-caption <- 'a caption!'
-plot(rnorm(100))
-```
-
-### Title (Slide 8)
-
-*italic*
-**bold**
-~~strikeout~~
-~subscript~
-^superscript^
-[small caps]{.smallcaps}
-`verbatim`
-
-> Block quote
+# Orientations
 
 
-### Title (Slide 9)
-
-:::::: {.columns}
-
-::: {.column}
-
-```{r, echo=FALSE, fig.cap=caption, fig.width = 5, fig.height = 6, dpi = 600}
-caption <- 'a caption!'
-plot(rnorm(100))
-```
-:::
-
-::: {.column}
-
-#### Content Header
-
-##### Smaller Header
-
-###### Smallest Header
-
-stuff
-
-:::
-
-::::::
+---
+- (Can be several slides)
+- Who were these men? (Longer version!)
+- Why were they important?
+- When did they meet?
+- What time period do their writings cover?
+- What *chapters* most concern their interactions?
+- Which *chapters* cover the same subject matter? (Graphic?)
 
 
-### Title (Slide 10)
-
-one two three four five
---- --- ----- ---  ----
-a   1   2     3    4
-b   1   2     3    4
+# Summary Statistics
 
 
-### Title (Slide 11)
+---
 
-```{r, echo=FALSE}
-knitr::kable(head(mtcars, 3)[, 2:5])
-```
+- Number of chapters, paragraphs, sentences, and words?
+- Words per sentence, paragraph, and chapter? (Min, max, mean, etc.)
+- How about *by* chapter, *per* something else? (Trends?!)
+- Sentences per paragraph and chapter? (Min, max, mean, etc.)
+- Paragraphs per chapter? (Min, max, mean, etc.)
+- Word length? By chapter?
+- How about punctuation?
+  - Total punctiation?
+  - Relative use of punctuation?
+  - Punctuation per sentence, paragraph, chapter?
+  - GRAPHIC (strip out all but punctuation!, show differences!)
+- This is *a lot*---wrap up in a couple of graphics?
 
 
-### Title (Slide 12)
+# Frequency Analysis
 
-:::::: {.columns}
 
-::: {.column}
+---
 
-Column 1
+- Introduce stopword list
+- Most frequent words, bigrams, trigrams (Cleveland dot)
+- Most frequent words, bigrams, trigrams *by chapter* (Cleveland dod)
+- **No wordcloud** because hackneyed
+- Inverse document frequency? TF-IDF?
+- TF-IDF between texts? (word, bigram, trigram + graphic)
+- TF-IDF between chapters of a single texts? (word, bigram, trigram + graphic)
 
-:::
 
-::: {.column}
+# Token Distribution Analysis
 
-```{r, echo=FALSE}
-knitr::kable(head(mtcars, 3)[, 2:5])
-```
 
-:::
+---
 
-::::::
+- Pick some words! (Arbitrary! Cherry picking!)
+- How about highlights off frequency and TF-IDF?
+- GRAPHIC dual distro plot with chapter, paragraph, and sentence backgrounds
+  - Maybe highlight events from orientation?
+  - Maybe highlight events in the war?
 
+
+# Correlation Analysis
+
+
+---
+
+- Pick some words! (Arbitrary! Cherry picking!)
+- How about highlights off frequency and TF-IDF?
+- GRAPHIC for each set of interesting words?
+
+
+# Type-Token Ratio
+
+
+---
+
+- TTR by chapter graphic?
+
+
+# Hapax Richness
+
+
+---
+
+- Not just hapax, also dis, tris, tetrakis
+- How about bigrams? Trigrams?
+- Shared hapax...
+- Maybe Venn diagram graphic?
+- Zipf's Law GRAPHIC
+
+# KWIC
+
+
+---
+
+- How much context?
+- Which words? How about *shared* hapax, dis tris, tetrakis?
+- How about TF-IDF words?
+- Does context help or just reinforce beliefs?
+
+
+# Sentiment Analysis
+
+
+---
+
+- Which sentiment dictionary?
+- How to handle negatives?
+- Show how many words missing from sentiment dictionary?
+- Stemming? (Is it available?)
+- Compare/contrast results and output?
+- Sentiments over time? GRAPHIC..
+  - How does the sentiment compare to their fortunes?
+  - How does the sentiment compare with the progress of the war?
+
+
+# Conclusions
+
+
+---
+
+- TBD---do analysis first!
+
+
+# Questions

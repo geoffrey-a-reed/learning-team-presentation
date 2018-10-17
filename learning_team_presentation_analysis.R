@@ -1279,9 +1279,81 @@ longstreet_word_sentence_corrs_nostop <-
 # (End)
 
 
-## @knitr exampleChunk
+## @knitr load_graphics_packages
 #
 #
-x <- c('testing', 'one', 'two', 'three')
-x
+suppressPackageStartupMessages({
+  library(cowplot)
+  library(extrafont)
+  library(ggplotify)
+  library(ggplot2)
+  library(scales)
+  library(wordcloud)
+})
 # (End)
+
+
+## @knitr declare_fonts
+#
+#
+docx_fonts <- c(
+  headings = 'Franklin Gothic Demi Cond',
+  body = 'Franklin Gothic Medium Cond'
+)
+# (End)
+
+
+## @knitr load_and_check_system_fonts
+#
+#
+if (docx_fonts %in% fonts() %>% all() %>% not()) {
+  warning('Importing fonts... this will take some time!')
+  font_import(prompt = FALSE)
+} else if (docx_fonts %in% fonts() %>% all() %>% not()) {
+  stop('Required fonts not found.')
+}
+# (End)
+
+
+## @knitr load_and_check_windows_fonts
+#
+#
+if (.Platform$OS.type != 'windows') {
+  stop('Unsupported operating system.')
+} else if (docx_fonts %in% windowsFonts() %>% all() %>% not()) {
+  loadfonts(device = 'win')
+}
+# (End)
+
+
+## @knitr declare_colors
+#
+#
+docx_colors <- c(
+  text_background_dark1 = rgb(0, 0, 0, maxColorValue = 255),
+  text_background_light1 = rgb(255, 255, 255, maxColorValue = 255),
+  text_background_dark2 = rgb(69, 69, 81, maxColorValue = 255),
+  text_background_light2 = rgb(216, 217, 220, maxColorValue = 255),
+  accent1 = rgb(227, 45, 145, maxColorValue = 255),
+  accent2 = rgb(200, 48, 204, maxColorValue = 255),
+  accent3 = rgb(78, 166, 220, maxColorValue = 255),
+  accent4 = rgb(71, 117, 231, maxColorValue = 255),
+  accent5 = rgb(137, 113, 225, maxColorValue = 255),
+  accent6 = rgb(213, 71, 115, maxColorValue = 255),
+  hyperlink = rgb(107, 159, 37, maxColorValue = 255),
+  followed_hyperlink = rgb(140, 140, 140, maxColorValue = 255)
+)
+# (End)
+
+
+## @knitr declare_desaturation_function
+#
+#
+desaturate = function(colors, ds=0.4, dv=0.7) {
+  colors = rgb2hsv(col2rgb(colors))
+  colors["v", ] = colors["v", ] + dv * (1 - colors["v", ])
+  colors["s", ] = ds * colors["s", ]
+  apply(colors, 2, function(color) hsv(color[1], color[2], color[3]))
+}
+# (End)
+
