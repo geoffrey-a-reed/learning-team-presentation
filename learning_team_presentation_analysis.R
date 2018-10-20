@@ -37,7 +37,7 @@ grant_texts <-
       text %>%
       str_extract(
         regex(
-          '(?:\\r\\n){5}CHAPTER.+herculean deeds of valor\\.',
+          '(?:\\r\\n){5}CHAPTER.+upon his own merit and without influence\\.',
           dotall = TRUE
         )
       ) %>%
@@ -250,7 +250,7 @@ longstreet_sentences <-
           'Battn\\.' = 'Battalion',
           'Cav\\.' = 'Cavalry',
           'Co\\.' = 'Company',
-          'Ind\\.' = '',
+          'Ind\\.' = 'Indiana',
           'Capt\\.' = 'Captain',
           'Regt\\.' = 'Regiment',
           'Lieut\\.' = 'Lieutenant',
@@ -362,6 +362,26 @@ longstreet_trigrams_nostop <-
     (word3 %in% smart_stopwords) %>% not()
   ) %>%
   unite(trigram, c('word1', 'word2', 'word3'), sep = ' ')
+
+grant_punctuation <-
+  grant_sentences %>%
+  mutate(sentence =
+           sentence %>%
+           str_replace_all('[^[:punct:]]', '') %>%
+           str_split('')
+  ) %>%
+  unnest(sentence) %>%
+  rename(punctuation = sentence)
+
+longstreet_punctuation <-
+  longstreet_sentences %>%
+  mutate(sentence =
+           sentence %>%
+           str_replace_all('[^[:punct:]]', '') %>%
+           str_split('')
+  ) %>%
+  unnest(sentence) %>%
+  rename(punctuation = sentence)
 # (End)
 
 
@@ -783,53 +803,6 @@ longstreet_ttr_chapter <-
 # (End)
 
 
-## @knitr declare_tidykwic
-#
-#
-kwic_sentence <- function(sentences, keywords, n = 5) {
-  maxlim <- n %/% 2
-  keywords %>%
-    map_dfr(function(keyword) {
-      pattern = str_c('(?:\\w+\\W+){0,', maxlim, '}\\b', keyword, '\\b(?:\\W+\\w+){0,', maxlim, '}')
-      sentences %>%
-        transmute(
-          text_num = text_num,
-          chapter_num = chapter_num,
-          paragraph_num = paragraph_num,
-          sentence_num = sentence_num,
-          keyword = keyword,
-          kwic = sentence %>% str_extract(pattern) %>% str_to_lower()
-        ) %>%
-        filter(kwic %>% is.na() %>% not())
-    })
-}
-# (End)
-
-
-## @knitr kwic_hapax
-#
-#
-suppressWarnings({
-
-  shared_hapax_words_kwic <-
-    bind_rows(grant_sentences, longstreet_sentences) %>%
-    kwic_sentence(shared_hapax_words)
-
-  shared_dis_words_kwic <-
-    bind_rows(grant_sentences, longstreet_sentences) %>%
-    kwic_sentence(shared_dis_words)
-
-  shared_tris_words_kwic <-
-    bind_rows(grant_sentences, longstreet_sentences) %>%
-    kwic_sentence(shared_tris_words)
-
-  shared_tetrakis_words_kwic <-
-    bind_rows(grant_sentences, longstreet_sentences) %>%
-    kwic_sentence(shared_tetrakis_words)
-})
-# (End)
-
-
 ## @knitr tf_idf
 #
 #
@@ -931,6 +904,18 @@ grant_trigram_chapter_freqs_nostop <-
   ungroup() %>%
   arrange(chapter_num, frequency %>% desc())
 
+grant_punct_freqs <-
+  grant_punctuation %>%
+  mutate(total = n()) %>%
+  group_by(punctuation) %>%
+  summarize(
+    total = first(total),
+    count = n(),
+    frequency = count / total
+  ) %>%
+  ungroup() %>%
+  arrange(frequency %>% desc())
+
 longstreet_word_freqs_nostop <-
   longstreet_words_nostop %>%
   mutate(total = n()) %>%
@@ -1008,6 +993,18 @@ longstreet_trigram_chapter_freqs_nostop <-
   ) %>%
   ungroup() %>%
   arrange(chapter_num, frequency %>% desc())
+
+longstreet_punct_freqs <-
+  longstreet_punctuation %>%
+  mutate(total = n()) %>%
+  group_by(punctuation) %>%
+  summarize(
+    total = first(total),
+    count = n(),
+    frequency = count / total
+  ) %>%
+  ungroup() %>%
+  arrange(frequency %>% desc())
 # (End)
 
 
@@ -1279,6 +1276,13 @@ longstreet_word_sentence_corrs_nostop <-
 # (End)
 
 
+## @knitr summary_statistics
+#
+#
+
+# (End)
+
+
 ## @knitr load_graphics_packages
 #
 #
@@ -1332,16 +1336,16 @@ if (.Platform$OS.type != 'windows') {
 docx_colors <- c(
   text_background_dark1 = rgb(0, 0, 0, maxColorValue = 255),
   text_background_light1 = rgb(255, 255, 255, maxColorValue = 255),
-  text_background_dark2 = rgb(69, 69, 81, maxColorValue = 255),
-  text_background_light2 = rgb(216, 217, 220, maxColorValue = 255),
-  accent1 = rgb(227, 45, 145, maxColorValue = 255),
-  accent2 = rgb(200, 48, 204, maxColorValue = 255),
-  accent3 = rgb(78, 166, 220, maxColorValue = 255),
-  accent4 = rgb(71, 117, 231, maxColorValue = 255),
-  accent5 = rgb(137, 113, 225, maxColorValue = 255),
-  accent6 = rgb(213, 71, 115, maxColorValue = 255),
+  text_background_dark2 = rgb(69, 95, 81, maxColorValue = 255),
+  text_background_light2 = rgb(227, 222, 209, maxColorValue = 255),
+  accent1 = rgb(84, 158, 57, maxColorValue = 255),
+  accent2 = rgb(138, 184, 51, maxColorValue = 255),
+  accent3 = rgb(192, 207, 58, maxColorValue = 255),
+  accent4 = rgb(2, 150, 118, maxColorValue = 255),
+  accent5 = rgb(74, 181, 196, maxColorValue = 255),
+  accent6 = rgb(9, 137, 177, maxColorValue = 255),
   hyperlink = rgb(107, 159, 37, maxColorValue = 255),
-  followed_hyperlink = rgb(140, 140, 140, maxColorValue = 255)
+  followed_hyperlink = rgb(186, 105, 6, maxColorValue = 255)
 )
 # (End)
 
@@ -1357,3 +1361,734 @@ desaturate = function(colors, ds=0.4, dv=0.7) {
 }
 # (End)
 
+
+## @knitr create_stats_plots
+#
+#
+grant_sentence_lengths <-
+  grant_words %>%
+  group_by(chapter_num, sentence_num) %>%
+  mutate(sentence_length = n()) %>%
+  ungroup() %>%
+  group_by(chapter_num) %>%
+  summarize(
+    sentence_length = mean(sentence_length),
+  ) %>%
+  ggplot(aes(x = chapter_num, y = sentence_length)) +
+  geom_hline(aes(yintercept = mean(sentence_length)), size = 1) +
+  geom_segment(
+    aes(xend = chapter_num, yend = mean(sentence_length)),
+    size = 1
+  ) +
+  geom_point(size = 2) +
+  ggtitle(label = 'Grant') +
+  scale_x_continuous(name = 'Chapter') +
+  scale_y_continuous(name = 'Mean Sentence Length') +
+  theme_cowplot() +
+  theme(
+    text = element_text(family = docx_fonts['body']),
+    title = element_text(family = docx_fonts['headings']),
+    axis.line = element_blank(),
+    panel.border = element_blank(),
+    axis.ticks = element_blank()
+  )
+
+longstreet_sentence_lengths <-
+  longstreet_words %>%
+  group_by(chapter_num, sentence_num) %>%
+  mutate(sentence_length = n()) %>%
+  ungroup() %>%
+  group_by(chapter_num) %>%
+  summarize(
+    sentence_length = mean(sentence_length),
+  ) %>%
+  ggplot(aes(x = chapter_num, y = sentence_length)) +
+  geom_hline(aes(yintercept = mean(sentence_length)), size = 1) +
+  geom_segment(
+    aes(xend = chapter_num, yend = mean(sentence_length)),
+    size = 1
+  ) +
+  geom_point(size = 2) +
+  ggtitle(label = 'Longstreet') +
+  scale_x_continuous(name = 'Chapter') +
+  scale_y_continuous(name = 'Mean Sentence Length') +
+  theme_cowplot() +
+  theme(
+    text = element_text(family = docx_fonts['body']),
+    title = element_text(family = docx_fonts['headings']),
+    axis.line = element_blank(),
+    panel.border = element_blank(),
+    axis.ticks = element_blank()
+  )
+
+sentence_lengths <-
+  plot_grid(grant_sentence_lengths, longstreet_sentence_lengths, ncol = 1)
+# (End)
+
+
+## @knitr create_freq_plots
+#
+#
+grant_word_freq_plot <-
+  grant_word_freqs_nostop %>%
+  mutate(word = reorder(word, frequency)) %>%
+  slice(1:5) %>%
+  ggplot(aes(x = word)) +
+  geom_segment(aes(xend = word, y = 0, yend = frequency), size = 1) +
+  geom_point(aes(y = frequency), size = 2) +
+  coord_flip() +
+  ggtitle('Grant') +
+  scale_y_continuous(labels = percent_format(accuracy = 0.1)) +
+  theme_cowplot() +
+  theme(axis.title = element_blank(), axis.ticks = element_blank(),
+        axis.line = element_blank(),
+        axis.text = element_text(family = docx_fonts['body']),
+        title = element_text(family = docx_fonts['header']))
+
+grant_bigram_freq_plot <-
+  grant_bigram_freqs_nostop %>%
+  mutate(bigram = reorder(bigram, frequency)) %>%
+  slice(1:5) %>%
+  ggplot(aes(x = bigram)) +
+  geom_segment(aes(xend = bigram, y = 0, yend = frequency), size = 1) +
+  geom_point(aes(y = frequency), size = 2) +
+  coord_flip() +
+  ggtitle('Grant') +
+  scale_y_continuous(labels = percent_format(accuracy = 0.1)) +
+  theme_cowplot() +
+  theme(axis.title = element_blank(), axis.ticks = element_blank(),
+        axis.line = element_blank(),
+        axis.text = element_text(family = docx_fonts['body']),
+        title = element_text(family = docx_fonts['header']))
+
+grant_trigram_freq_plot <-
+  grant_trigram_freqs_nostop %>%
+  mutate(trigram = reorder(trigram, frequency)) %>%
+  slice(1:5) %>%
+  ggplot(aes(x = trigram)) +
+  geom_segment(aes(xend = trigram, y = 0, yend = frequency), size = 1) +
+  geom_point(aes(y = frequency), size = 2) +
+  coord_flip() +
+  ggtitle('Grant') +
+  scale_y_continuous(labels = percent_format(accuracy = 0.1)) +
+  theme_cowplot() +
+  theme(axis.title = element_blank(), axis.ticks = element_blank(),
+        axis.line = element_blank(),
+        axis.text = element_text(family = docx_fonts['body']),
+        title = element_text(family = docx_fonts['header']))
+
+grant_punct_freq_plot <-
+  grant_punct_freqs %>%
+  mutate(punctuation = reorder(punctuation, frequency)) %>%
+  slice(1:5) %>%
+  ggplot(aes(x = punctuation)) +
+  geom_segment(aes(xend = punctuation, y = 0, yend = frequency), size = 1) +
+  geom_point(aes(y = frequency), size = 2) +
+  coord_flip() +
+  ggtitle('Grant') +
+  scale_y_continuous(labels = percent_format(accuracy = 0.1)) +
+  theme_cowplot() +
+  theme(axis.title = element_blank(), axis.ticks = element_blank(),
+        axis.line = element_blank(),
+        axis.text = element_text(family = docx_fonts['body']),
+        title = element_text(family = docx_fonts['header']))
+
+longstreet_word_freq_plot <-
+  longstreet_word_freqs_nostop %>%
+  mutate(word = reorder(word, frequency)) %>%
+  slice(1:5) %>%
+  ggplot(aes(x = word)) +
+  geom_segment(aes(xend = word, y = 0, yend = frequency), size = 1) +
+  geom_point(aes(y = frequency), size = 2) +
+  coord_flip() +
+  ggtitle('Longstreet') +
+  scale_y_continuous(labels = percent_format(accuracy = 0.1)) +
+  theme_cowplot() +
+  theme(axis.title = element_blank(), axis.ticks = element_blank(),
+        axis.line = element_blank(),
+        axis.text = element_text(family = docx_fonts['body']),
+        title = element_text(family = docx_fonts['header']))
+
+longstreet_bigram_freq_plot <-
+  longstreet_bigram_freqs_nostop %>%
+  mutate(bigram = reorder(bigram, frequency)) %>%
+  slice(1:5) %>%
+  ggplot(aes(x = bigram)) +
+  geom_segment(aes(xend = bigram, y = 0, yend = frequency), size = 1) +
+  geom_point(aes(y = frequency), size = 2) +
+  coord_flip() +
+  ggtitle('Longstreet') +
+  scale_y_continuous(labels = percent_format(accuracy = 0.1)) +
+  theme_cowplot() +
+  theme(axis.title = element_blank(), axis.ticks = element_blank(),
+        axis.line = element_blank(),
+        axis.text = element_text(family = docx_fonts['body']),
+        title = element_text(family = docx_fonts['header']))
+
+longstreet_trigram_freq_plot <-
+  longstreet_trigram_freqs_nostop %>%
+  mutate(trigram = reorder(trigram, frequency)) %>%
+  slice(1:5) %>%
+  ggplot(aes(x = trigram)) +
+  geom_segment(aes(xend = trigram, y = 0, yend = frequency), size = 1) +
+  geom_point(aes(y = frequency), size = 2) +
+  coord_flip() +
+  ggtitle('Longstreet') +
+  scale_y_continuous(labels = percent_format(accuracy = 0.1)) +
+  theme_cowplot() +
+  theme(axis.title = element_blank(), axis.ticks = element_blank(),
+        axis.line = element_blank(),
+        axis.text = element_text(family = docx_fonts['body']),
+        title = element_text(family = docx_fonts['header']))
+
+longstreet_punct_freq_plot <-
+  longstreet_punct_freqs %>%
+  mutate(punctuation = reorder(punctuation, frequency)) %>%
+  slice(1:5) %>%
+  ggplot(aes(x = punctuation)) +
+  geom_segment(aes(xend = punctuation, y = 0, yend = frequency), size = 1) +
+  geom_point(aes(y = frequency), size = 2) +
+  coord_flip() +
+  ggtitle('Longstreet') +
+  scale_y_continuous(labels = percent_format(accuracy = 0.1)) +
+  theme_cowplot() +
+  theme(axis.title = element_blank(), axis.ticks = element_blank(),
+        axis.line = element_blank(),
+        axis.text = element_text(family = docx_fonts['body']),
+        title = element_text(family = docx_fonts['header']))
+
+grant_word_starting_sentence_freqs_plot <-
+  grant_word_starting_sentence_freqs_nostop %>%
+  mutate(word = reorder(word, frequency)) %>%
+  slice(1:5) %>%
+  ggplot(aes(x = word)) +
+  geom_segment(aes(xend = word, y = 0, yend = frequency), size = 1) +
+  geom_point(aes(y = frequency), size = 2) +
+  coord_flip() +
+  ggtitle('Grant') +
+  scale_y_continuous(labels = percent_format(accuracy = 0.1)) +
+  theme_cowplot() +
+  theme(axis.title = element_blank(), axis.ticks = element_blank(),
+        axis.line = element_blank(),
+        axis.text = element_text(family = docx_fonts['body']),
+        title = element_text(family = docx_fonts['header']))
+
+grant_word_ending_sentence_freqs_plot <-
+  grant_word_ending_sentence_freqs_nostop %>%
+  mutate(word = reorder(word, frequency)) %>%
+  slice(1:5) %>%
+  ggplot(aes(x = word)) +
+  geom_segment(aes(xend = word, y = 0, yend = frequency), size = 1) +
+  geom_point(aes(y = frequency), size = 2) +
+  coord_flip() +
+  ggtitle('Grant') +
+  scale_y_continuous(labels = percent_format(accuracy = 0.1)) +
+  theme_cowplot() +
+  theme(axis.title = element_blank(), axis.ticks = element_blank(),
+        axis.line = element_blank(),
+        axis.text = element_text(family = docx_fonts['body']),
+        title = element_text(family = docx_fonts['header']))
+
+grant_bigram_starting_sentence_freqs_plot <-
+  grant_bigram_starting_sentence_freqs_nostop %>%
+  mutate(bigram = reorder(bigram, frequency)) %>%
+  slice(1:5) %>%
+  ggplot(aes(x = bigram)) +
+  geom_segment(aes(xend = bigram, y = 0, yend = frequency), size = 1) +
+  geom_point(aes(y = frequency), size = 2) +
+  coord_flip() +
+  ggtitle('Grant') +
+  scale_y_continuous(labels = percent_format(accuracy = 0.1)) +
+  theme_cowplot() +
+  theme(axis.title = element_blank(), axis.ticks = element_blank(),
+        axis.line = element_blank(),
+        axis.text = element_text(family = docx_fonts['body']),
+        title = element_text(family = docx_fonts['header']))
+
+grant_bigram_ending_sentence_freqs_plot <-
+  grant_bigram_ending_sentence_freqs_nostop %>%
+  mutate(bigram = reorder(bigram, frequency)) %>%
+  slice(1:5) %>%
+  ggplot(aes(x = bigram)) +
+  geom_segment(aes(xend = bigram, y = 0, yend = frequency), size = 1) +
+  geom_point(aes(y = frequency), size = 2) +
+  coord_flip() +
+  ggtitle('Grant') +
+  scale_y_continuous(labels = percent_format(accuracy = 0.1)) +
+  theme_cowplot() +
+  theme(axis.title = element_blank(), axis.ticks = element_blank(),
+        axis.line = element_blank(),
+        axis.text = element_text(family = docx_fonts['body']),
+        title = element_text(family = docx_fonts['header']))
+
+grant_trigram_starting_sentence_freqs_plot <-
+  grant_trigram_starting_sentence_freqs_nostop %>%
+  mutate(trigram = reorder(trigram, frequency)) %>%
+  slice(1:5) %>%
+  ggplot(aes(x = trigram)) +
+  geom_segment(aes(xend = trigram, y = 0, yend = frequency), size = 1) +
+  geom_point(aes(y = frequency), size = 2) +
+  coord_flip() +
+  ggtitle('Grant') +
+  scale_y_continuous(labels = percent_format(accuracy = 0.1)) +
+  theme_cowplot() +
+  theme(axis.title = element_blank(), axis.ticks = element_blank(),
+        axis.line = element_blank(),
+        axis.text = element_text(family = docx_fonts['body']),
+        title = element_text(family = docx_fonts['header']))
+
+grant_trigram_ending_sentence_freqs_plot <-
+  grant_trigram_ending_sentence_freqs_nostop %>%
+  mutate(trigram = reorder(trigram, frequency)) %>%
+  slice(1:5) %>%
+  ggplot(aes(x = trigram)) +
+  geom_segment(aes(xend = trigram, y = 0, yend = frequency), size = 1) +
+  geom_point(aes(y = frequency), size = 2) +
+  coord_flip() +
+  ggtitle('Grant') +
+  scale_y_continuous(labels = percent_format(accuracy = 0.1)) +
+  theme_cowplot() +
+  theme(axis.title = element_blank(), axis.ticks = element_blank(),
+        axis.line = element_blank(),
+        axis.text = element_text(family = docx_fonts['body']),
+        title = element_text(family = docx_fonts['header']))
+
+longstreet_word_starting_sentence_freqs_plot <-
+  longstreet_word_starting_sentence_freqs_nostop %>%
+  mutate(word = reorder(word, frequency)) %>%
+  slice(1:5) %>%
+  ggplot(aes(x = word)) +
+  geom_segment(aes(xend = word, y = 0, yend = frequency), size = 1) +
+  geom_point(aes(y = frequency), size = 2) +
+  coord_flip() +
+  ggtitle('Longstreet') +
+  scale_y_continuous(labels = percent_format(accuracy = 0.1)) +
+  theme_cowplot() +
+  theme(axis.title = element_blank(), axis.ticks = element_blank(),
+        axis.line = element_blank(),
+        axis.text = element_text(family = docx_fonts['body']),
+        title = element_text(family = docx_fonts['header']))
+
+longstreet_word_ending_sentence_freqs_plot <-
+  longstreet_word_ending_sentence_freqs_nostop %>%
+  mutate(word = reorder(word, frequency)) %>%
+  slice(1:5) %>%
+  ggplot(aes(x = word)) +
+  geom_segment(aes(xend = word, y = 0, yend = frequency), size = 1) +
+  geom_point(aes(y = frequency), size = 2) +
+  coord_flip() +
+  ggtitle('Longstreet') +
+  scale_y_continuous(labels = percent_format(accuracy = 0.1)) +
+  theme_cowplot() +
+  theme(axis.title = element_blank(), axis.ticks = element_blank(),
+        axis.line = element_blank(),
+        axis.text = element_text(family = docx_fonts['body']),
+        title = element_text(family = docx_fonts['header']))
+
+longstreet_bigram_starting_sentence_freqs_plot <-
+  longstreet_bigram_starting_sentence_freqs_nostop %>%
+  mutate(bigram = reorder(bigram, frequency)) %>%
+  slice(1:5) %>%
+  ggplot(aes(x = bigram)) +
+  geom_segment(aes(xend = bigram, y = 0, yend = frequency), size = 1) +
+  geom_point(aes(y = frequency), size = 2) +
+  coord_flip() +
+  ggtitle('Longstreet') +
+  scale_y_continuous(labels = percent_format(accuracy = 0.1)) +
+  theme_cowplot() +
+  theme(axis.title = element_blank(), axis.ticks = element_blank(),
+        axis.line = element_blank(),
+        axis.text = element_text(family = docx_fonts['body']),
+        title = element_text(family = docx_fonts['header']))
+
+longstreet_bigram_ending_sentence_freqs_plot <-
+  longstreet_bigram_ending_sentence_freqs_nostop %>%
+  mutate(bigram = reorder(bigram, frequency)) %>%
+  slice(1:5) %>%
+  ggplot(aes(x = bigram)) +
+  geom_segment(aes(xend = bigram, y = 0, yend = frequency), size = 1) +
+  geom_point(aes(y = frequency), size = 2) +
+  coord_flip() +
+  ggtitle('Longstreet') +
+  scale_y_continuous(labels = percent_format(accuracy = 0.1)) +
+  theme_cowplot() +
+  theme(axis.title = element_blank(), axis.ticks = element_blank(),
+        axis.line = element_blank(),
+        axis.text = element_text(family = docx_fonts['body']),
+        title = element_text(family = docx_fonts['header']))
+
+longstreet_trigram_starting_sentence_freqs_plot <-
+  longstreet_trigram_starting_sentence_freqs_nostop %>%
+  mutate(trigram = reorder(trigram, frequency)) %>%
+  slice(1:5) %>%
+  ggplot(aes(x = trigram)) +
+  geom_segment(aes(xend = trigram, y = 0, yend = frequency), size = 1) +
+  geom_point(aes(y = frequency), size = 2) +
+  coord_flip() +
+  ggtitle('Longstreet') +
+  scale_y_continuous(labels = percent_format(accuracy = 0.1)) +
+  theme_cowplot() +
+  theme(axis.title = element_blank(), axis.ticks = element_blank(),
+        axis.line = element_blank(),
+        axis.text = element_text(family = docx_fonts['body']),
+        title = element_text(family = docx_fonts['header']))
+
+longstreet_trigram_ending_sentence_freqs_plot <-
+  longstreet_trigram_ending_sentence_freqs_nostop %>%
+  mutate(trigram = reorder(trigram, frequency)) %>%
+  slice(1:5) %>%
+  ggplot(aes(x = trigram)) +
+  geom_segment(aes(xend = trigram, y = 0, yend = frequency), size = 1) +
+  geom_point(aes(y = frequency), size = 2) +
+  coord_flip() +
+  ggtitle('Longstreet') +
+  scale_y_continuous(labels = percent_format(accuracy = 0.1)) +
+  theme_cowplot() +
+  theme(axis.title = element_blank(), axis.ticks = element_blank(),
+        axis.line = element_blank(),
+        axis.text = element_text(family = docx_fonts['body']),
+        title = element_text(family = docx_fonts['header']))
+
+word_freq_plots <-
+  plot_grid(
+    grant_word_freq_plot,
+    longstreet_word_freq_plot,
+    nrow = 1
+  )
+
+
+bigram_freq_plots <-
+  plot_grid(
+    grant_bigram_freq_plot,
+    longstreet_bigram_freq_plot,
+    nrow = 1
+  )
+
+trigram_freq_plots <-
+  plot_grid(
+    grant_trigram_freq_plot,
+    longstreet_trigram_freq_plot,
+    nrow = 1
+  )
+
+punct_freq_plots <-
+  plot_grid(
+    grant_punct_freq_plot,
+    longstreet_punct_freq_plot,
+    nrow = 1
+  )
+
+trigram_freq_plots <-
+  plot_grid(
+    grant_trigram_freq_plot,
+    longstreet_trigram_freq_plot,
+    nrow = 1
+  )
+
+word_starting_sentence_freqs_plots <-
+  plot_grid(
+    grant_word_starting_sentence_freqs_plot,
+    longstreet_word_starting_sentence_freqs_plot,
+    nrow = 1
+  )
+
+bigram_starting_sentence_freqs_plots <-
+  plot_grid(
+    grant_bigram_starting_sentence_freqs_plot,
+    longstreet_bigram_starting_sentence_freqs_plot,
+    nrow = 1
+  )
+
+trigram_starting_sentence_freqs_plots <-
+  plot_grid(
+    grant_trigram_starting_sentence_freqs_plot,
+    longstreet_trigram_starting_sentence_freqs_plot,
+    nrow = 1
+  )
+
+word_ending_sentence_freqs_plots <-
+  plot_grid(
+    grant_word_ending_sentence_freqs_plot,
+    longstreet_word_ending_sentence_freqs_plot,
+    nrow = 1
+  )
+
+bigram_ending_sentence_freqs_plots <-
+  plot_grid(
+    grant_bigram_ending_sentence_freqs_plot,
+    longstreet_bigram_ending_sentence_freqs_plot,
+    nrow = 1
+  )
+
+trigram_ending_sentence_freqs_plots <-
+  plot_grid(
+    grant_trigram_ending_sentence_freqs_plot,
+    longstreet_trigram_ending_sentence_freqs_plot,
+    nrow = 1
+  )
+# (End)
+
+
+## @knitr create_zipf_plots
+#
+#
+grant_zipf_plot <-
+  grant_words %>%
+  group_by(word) %>%
+  summarize(count = n()) %>%
+  ungroup() %>%
+  mutate(total = n()) %>%
+  group_by(word) %>%
+  summarize(freq = count / total) %>%
+  ungroup() %>%
+  arrange(freq %>% desc()) %>%
+  mutate(step_rank = freq %>% dense_rank()) %>%
+  ungroup() %>%
+  mutate(
+    rank = row_number(),
+    color_rank =
+      case_when(
+        step_rank == min(step_rank) ~ 'Hapax Legomenon',
+        step_rank == min(step_rank) + 1 ~ 'Dis Legomenon',
+        step_rank == min(step_rank) + 2 ~ 'Tris Legomenon',
+        step_rank == min(step_rank) + 3 ~ 'Tetrakis Legomenon',
+        TRUE ~ '(more frequent)'
+      ) %>% factor(levels = c(
+        '(more frequent)',
+        'Tetrakis Legomenon',
+        'Tris Legomenon',
+        'Dis Legomenon',
+        'Hapax Legomenon'
+      )),
+    label_rank = if_else(step_rank > max(step_rank) - 2, word, NA_character_)
+  ) %>%
+  ggplot(aes(x = rank, y = freq, color = color_rank)) +
+  geom_point(size = 2) +
+  geom_text(
+    aes(label = label_rank),
+    vjust = -0.3,
+    hjust = -1,
+    show.legend = FALSE,
+    na.rm = TRUE
+  ) +
+  scale_x_log10(name = 'Rank') +
+  scale_y_log10(name = 'Frequency',) +
+  scale_color_manual(
+    name = NULL,
+    values = docx_colors[c(1, 7:10)] %>% unname()
+  ) +
+  ggtitle(label = 'Grant') +
+  theme_cowplot() +
+  theme(
+    text = element_text(family = docx_fonts['body']),
+    title = element_text(family = docx_fonts['headings']),
+    legend.position = c(0.05, 0.2)
+  )
+
+longstreet_zipf_plot <-
+  longstreet_words %>%
+  group_by(word) %>%
+  summarize(count = n()) %>%
+  ungroup() %>%
+  mutate(total = n()) %>%
+  group_by(word) %>%
+  summarize(freq = count / total) %>%
+  ungroup() %>%
+  arrange(freq %>% desc()) %>%
+  mutate(step_rank = freq %>% dense_rank()) %>%
+  ungroup() %>%
+  mutate(
+    rank = row_number(),
+    color_rank =
+      case_when(
+        step_rank == min(step_rank) ~ 'Hapax Legomenon',
+        step_rank == min(step_rank) + 1 ~ 'Dis Legomenon',
+        step_rank == min(step_rank) + 2 ~ 'Tris Legomenon',
+        step_rank == min(step_rank) + 3 ~ 'Tetrakis Legomenon',
+        TRUE ~ '(more frequent)'
+      ) %>% factor(levels = c(
+        '(more frequent)',
+        'Tetrakis Legomenon',
+        'Tris Legomenon',
+        'Dis Legomenon',
+        'Hapax Legomenon'
+      )),
+    label_rank = if_else(step_rank > max(step_rank) - 2, word, NA_character_)
+  ) %>%
+  ggplot(aes(x = rank, y = freq, color = color_rank)) +
+  geom_point(size = 2, show.legend = FALSE) +
+  geom_text(
+    aes(label = label_rank),
+    vjust = -0.3,
+    hjust = -1,
+    show.legend = FALSE,
+    na.rm = TRUE
+  ) +
+  scale_x_log10(name = 'Rank') +
+  scale_y_log10(name = 'Frequency',) +
+  scale_color_manual(
+    name = NULL,
+    values = docx_colors[c(1, 7:10)] %>% unname()
+  ) +
+  ggtitle(label = 'Longstreet') +
+  theme_cowplot() +
+  theme(
+    text = element_text(family = docx_fonts['body']),
+    title = element_text(family = docx_fonts['headings']),
+  )
+
+zipf_plots <-
+  plot_grid(grant_zipf_plot, longstreet_zipf_plot, nrow = 1, align = 'h')
+# (End)
+
+
+## @knitr create_ttr_plots
+#
+#
+grant_ttr_plot <-
+  grant_ttr_words_by_chapter %>%
+  ggplot(aes(x = chapter_num, y = ttr_word)) +
+  geom_hline(aes(yintercept = mean(ttr_word)), size = 1) +
+  geom_segment(
+    aes(xend = chapter_num, yend = mean(ttr_word)),
+    size = 1
+  ) +
+  geom_point(size = 2) +
+  ggtitle(label = 'Grant') +
+  scale_x_continuous(name = 'Chapter') +
+  scale_y_continuous(name = 'TTR') +
+  theme_cowplot() +
+  theme(
+    text = element_text(family = docx_fonts['body']),
+    title = element_text(family = docx_fonts['headings']),
+    axis.line = element_blank(),
+    panel.border = element_blank(),
+    axis.ticks = element_blank()
+  )
+
+longstreet_ttr_plot <-
+  longstreet_ttr_words_by_chapter %>%
+    ggplot(aes(x = chapter_num, y = ttr_word)) +
+    geom_hline(aes(yintercept = mean(ttr_word)), size = 1) +
+    geom_segment(
+      aes(xend = chapter_num, yend = mean(ttr_word)),
+      size = 1
+    ) +
+    geom_point(size = 2) +
+    ggtitle(label = 'Longstreet') +
+    scale_x_continuous(name = 'Chapter') +
+    scale_y_continuous(name = 'TTR') +
+    theme_cowplot() +
+    theme(
+      text = element_text(family = docx_fonts['body']),
+      title = element_text(family = docx_fonts['headings']),
+      axis.line = element_blank(),
+      panel.border = element_blank(),
+      axis.ticks = element_blank()
+    )
+
+ttr_plot <- plot_grid(grant_ttr_plot, longstreet_ttr_plot, ncol = 1)
+# (End)
+
+
+## @knitr create_sentiment_plot
+#
+#
+grant_sentiment_plot <-
+  grant_words %>%
+  inner_join(get_sentiments(lexicon = 'afinn'), by = 'word') %>%
+  group_by(chapter_num) %>%
+  summarize(score = mean(score)) %>%
+  ggplot(aes(x = chapter_num, y = score)) +
+  geom_hline(aes(yintercept = mean(score)), size = 1) +
+  geom_segment(
+    aes(xend = chapter_num, yend = mean(score)),
+    size = 1
+  ) +
+  geom_point(size = 2) +
+  ggtitle(label = 'Grant') +
+  scale_x_continuous(name = 'Chapter') +
+  scale_y_continuous(name = 'Mean AFINN Sentiment') +
+  theme_cowplot() +
+  theme(
+    text = element_text(family = docx_fonts['body']),
+    title = element_text(family = docx_fonts['headings']),
+    axis.line = element_blank(),
+    panel.border = element_blank(),
+    axis.ticks = element_blank()
+  )
+
+longstreet_sentiment_plot <-
+  longstreet_words %>%
+  inner_join(get_sentiments(lexicon = 'afinn'), by = 'word') %>%
+  group_by(chapter_num) %>%
+  summarize(score = mean(score)) %>%
+  ggplot(aes(x = chapter_num, y = score)) +
+  geom_hline(aes(yintercept = mean(score)), size = 1) +
+  geom_segment(
+    aes(xend = chapter_num, yend = mean(score)),
+    size = 1
+  ) +
+  geom_point(size = 2) +
+  ggtitle(label = 'Longstreet') +
+  scale_x_continuous(name = 'Chapter') +
+  scale_y_continuous(name = 'Mean AFINN Sentiment') +
+  theme_cowplot() +
+  theme(
+    text = element_text(family = docx_fonts['body']),
+    title = element_text(family = docx_fonts['headings']),
+    axis.line = element_blank(),
+    panel.border = element_blank(),
+    axis.ticks = element_blank()
+  )
+
+sentiment_plot <- plot_grid(
+  grant_sentiment_plot,
+  longstreet_sentiment_plot,
+  ncol = 1
+)
+# (End)
+
+
+## @knitr create_correlation_plot
+#
+#
+grant_corrs <- grant_word_sentence_corrs_nostop %>%
+  filter(word1 == 'negro') %>%
+  arrange(correlation) %>%
+  mutate(word = reorder(word2, correlation)) %>%
+  slice(1:5) %>%
+  ggplot(aes(x = word)) +
+  geom_segment(aes(xend = word, y = 0, yend = correlation), size = 1) +
+  geom_point(aes(y = correlation), size = 2) +
+  coord_flip() +
+  ggtitle('Grant') +
+  scale_x_discrete(position = 'top') +
+  scale_y_continuous(labels = percent_format(accuracy = 0.1)) +
+  theme_cowplot() +
+  theme(axis.title = element_blank(), axis.ticks = element_blank(),
+        axis.line = element_blank(),
+        axis.text = element_text(family = docx_fonts['body']),
+        title = element_text(family = docx_fonts['header']))
+
+longstreet_corrs <- longstreet_word_sentence_corrs_nostop %>%
+  filter(word1 == 'negro') %>%
+  arrange(correlation) %>%
+  mutate(word = reorder(word2, correlation)) %>%
+  slice(1:5) %>%
+  ggplot(aes(x = word)) +
+  geom_segment(aes(xend = word, y = 0, yend = correlation), size = 1) +
+  geom_point(aes(y = correlation), size = 2) +
+  coord_flip() +
+  ggtitle('Longstreet') +
+  scale_x_discrete(position = 'top') +
+  scale_y_continuous(labels = percent_format(accuracy = 0.1)) +
+  theme_cowplot() +
+  theme(axis.title = element_blank(), axis.ticks = element_blank(),
+        axis.line = element_blank(),
+        axis.text = element_text(family = docx_fonts['body']),
+        title = element_text(family = docx_fonts['header']))
+
+correlation_plot <-
+  plot_grid(grant_corrs, longstreet_corrs, nrow = 1)
+# (End)

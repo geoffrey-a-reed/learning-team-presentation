@@ -1,7 +1,6 @@
 ---
 title: "Grant & Longstreet"
 subtitle: "An\nOpposing\nFriendship"
-authors: "Randy Green | Daniel Hadidon | Geoffrey Reed"
 output:
     powerpoint_presentation:
         slide_level: 2
@@ -15,6 +14,41 @@ knitr::opts_chunk$set(echo = FALSE)
 knitr::read_chunk('learning_team_presentation_analysis.R')
 ```
 
+
+```{r analysis}
+<<load_analysis_packages>>
+<<load_stopwords>>
+<<read_and_preprocess_text>>
+<<extract_chapters>>
+<<extract_paragraphs>>
+<<extract_sentences>>
+<<extract_tokens>>
+<<token_counts>>
+<<extract_hapax>>
+<<type_token_ratio>>
+<<tf_idf>>
+<<token_frequencies>>
+<<positional_token_frequencies>>
+<<token_correlations>>
+<<summary_statistics>>
+```
+
+
+```{r plots}
+<<load_graphics_packages>>
+<<declare_fonts>>
+<<load_and_check_system_fonts>>
+<<load_and_check_windows_fonts>>
+<<declare_colors>>
+<<declare_desaturation_function>>
+<<create_freq_plots>>
+<<create_zipf_plots>>
+<<create_ttr_plots>>
+<<create_stats_plots>>
+<<create_sentiment_plot>>
+<<create_correlation_plot>>
+```
+
 ## Texts
 
 ###### *Personal Memoirs of U. S. Grant*
@@ -26,145 +60,145 @@ knitr::read_chunk('learning_team_presentation_analysis.R')
 - by James Longstreet
 
 
-## Introductions
-
-- Who were these guys? (30-second version)
-- Who are we? (10-second version)
-
-
 ## Topics
 
-- Orientations
 - Summary Statistics
 - Frequency Analysis
-- Token Distribution Analysis
 - Correlation Analysis
 - Type-Token Ratio
 - Hapax Richness
-- KWIC
 - Sentiment Analysis
-- Conclusions
-
-
-# Orientations
-
-
----
-- (Can be several slides)
-- Who were these men? (Longer version!)
-- Why were they important?
-- When did they meet?
-- What time period do their writings cover?
-- What *chapters* most concern their interactions?
-- Which *chapters* cover the same subject matter? (Graphic?)
 
 
 # Summary Statistics
 
 
----
+## Sentence Lengths
 
-- Number of chapters, paragraphs, sentences, and words?
-- Words per sentence, paragraph, and chapter? (Min, max, mean, etc.)
-- How about *by* chapter, *per* something else? (Trends?!)
-- Sentences per paragraph and chapter? (Min, max, mean, etc.)
-- Paragraphs per chapter? (Min, max, mean, etc.)
-- Word length? By chapter?
-- How about punctuation?
-  - Total punctiation?
-  - Relative use of punctuation?
-  - Punctuation per sentence, paragraph, chapter?
-  - GRAPHIC (strip out all but punctuation!, show differences!)
-- This is *a lot*---wrap up in a couple of graphics?
+
+```{r senlen, fig.width=8, fig.height=4, dpi=600, fig.cap=caption}
+caption <- 'Dummy caption'
+sentence_lengths
+```
 
 
 # Frequency Analysis
 
 
----
+## Word Frequency
 
-- Introduce stopword list
-- Most frequent words, bigrams, trigrams (Cleveland dot)
-- Most frequent words, bigrams, trigrams *by chapter* (Cleveland dod)
-- **No wordcloud** because hackneyed
-- Inverse document frequency? TF-IDF?
-- TF-IDF between texts? (word, bigram, trigram + graphic)
-- TF-IDF between chapters of a single texts? (word, bigram, trigram + graphic)
+```{r word_freq_plot, fig.width=8, fig.height=4, dpi=600, fig.cap=caption}
+caption <- 'Dummy caption'
+word_freq_plots
+```
 
 
-# Token Distribution Analysis
+## Bigram Frequency
+
+```{r bigram_freq_plot, fig.width=8, fig.height=4, dpi=600, fig.cap=caption}
+caption <- 'Dummy caption'
+bigram_freq_plots
+```
 
 
----
+## Trigram Frequency
 
-- Pick some words! (Arbitrary! Cherry picking!)
-- How about highlights off frequency and TF-IDF?
-- GRAPHIC dual distro plot with chapter, paragraph, and sentence backgrounds
-  - Maybe highlight events from orientation?
-  - Maybe highlight events in the war?
+```{r trigram_freq_plot, fig.width=8, fig.height=4, dpi=600, fig.cap=caption}
+caption <- 'Dummy caption'
+trigram_freq_plots
+```
+
+## Punctuation Frequency
+
+```{r punct_freq_plot, fig.width=8, fig.height=4, dpi=600, fig.cap=caption}
+caption <- 'Dummy caption'
+punct_freq_plots
+```
+
+
+## Words Starting Sentences
+
+```{r bsent_freq1, fig.width=8, fig.height=4, dpi=600, fig.cap=caption}
+caption <- 'Dummy caption'
+word_starting_sentence_freqs_plots
+```
+
+
+## Bigrams Starting Sentences
+
+```{r bsent_freq2, fig.width=8, fig.height=4, dpi=600, fig.cap=caption}
+caption <- 'Dummy caption'
+bigram_starting_sentence_freqs_plots
+```
+
+
+## Trigrams Starting Sentences
+```{r bsent_freq3, fig.width=8, fig.height=4, dpi=600, fig.cap=caption}
+caption <- 'Dummy caption'
+trigram_starting_sentence_freqs_plots
+```
+
+
+## Words Ending Sentences
+
+```{r esent_freq1, fig.width=8, fig.height=4, dpi=600, fig.cap=caption}
+caption <- 'Dummy caption'
+word_ending_sentence_freqs_plots
+```
+
+
+## Bigrams Ending Sentences
+
+```{r esent_freq2, fig.width=8, fig.height=4, dpi=600, fig.cap=caption}
+caption <- 'Dummy caption'
+bigram_ending_sentence_freqs_plots
+```
+
+
+## Trigrams Ending Sentences
+```{r esent_freq3, fig.width=8, fig.height=4, dpi=600, fig.cap=caption}
+caption <- 'Dummy caption'
+trigram_ending_sentence_freqs_plots
+```
 
 
 # Correlation Analysis
 
 
----
-
-- Pick some words! (Arbitrary! Cherry picking!)
-- How about highlights off frequency and TF-IDF?
-- GRAPHIC for each set of interesting words?
+## Word Correlations
+```{r corr1, fig.width=8, fig.height=4, dpi=600, fig.cap=caption}
+caption <- 'Dummy caption'
+correlation_plot
+```
 
 
 # Type-Token Ratio
 
 
----
-
-- TTR by chapter graphic?
-
+## Type-Token Ratio
+```{r ttr, fig.width=8, fig.height=4, dpi=600, fig.cap=caption}
+caption <- 'Dummy caption'
+ttr_plot
+```
 
 # Hapax Richness
 
 
----
-
-- Not just hapax, also dis, tris, tetrakis
-- How about bigrams? Trigrams?
-- Shared hapax...
-- Maybe Venn diagram graphic?
-- Zipf's Law GRAPHIC
-
-# KWIC
-
-
----
-
-- How much context?
-- Which words? How about *shared* hapax, dis tris, tetrakis?
-- How about TF-IDF words?
-- Does context help or just reinforce beliefs?
-
+## Zipf's Law
+```{r zipf, fig.width=10, fig.height=5, dpi=600, fig.cap=caption}
+caption <- 'Dummy caption'
+zipf_plots
+```
 
 # Sentiment Analysis
 
 
----
+## Sentiments by Chapter
 
-- Which sentiment dictionary?
-- How to handle negatives?
-- Show how many words missing from sentiment dictionary?
-- Stemming? (Is it available?)
-- Compare/contrast results and output?
-- Sentiments over time? GRAPHIC..
-  - How does the sentiment compare to their fortunes?
-  - How does the sentiment compare with the progress of the war?
-
-
-# Conclusions
-
-
----
-
-- TBD---do analysis first!
+```{r sent, fig.width=8, fig.height=4, dpi=600, fig.cap=caption}
+caption <- 'Dummy caption'
+sentiment_plot
+```
 
 
 # Questions
